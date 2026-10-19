@@ -2,6 +2,7 @@
 
 import { PanelLeftCloseIcon, PanelLeftOpenIcon } from "lucide-react";
 import { Button } from "../ui/button";
+import { UserButton } from "@clerk/nextjs";
 
 interface EditorNavbarProps {
   isOpen: boolean;
@@ -22,7 +23,9 @@ export default function EditorNavbar({ isOpen, onToggle }: EditorNavbarProps) {
         </Button>
       </div>
       <div className="flex-1" />
-      <div className="flex items-center" />
+      <div className="flex items-center">
+        <UserButton />
+      </div>
     </header>
   );
 }

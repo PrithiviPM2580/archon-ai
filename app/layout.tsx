@@ -2,8 +2,10 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono, Inter } from "next/font/google";
 import "./globals.css";
 import { cn } from "@/lib/utils";
+import { ClerkProvider } from "@clerk/nextjs";
+import { dark } from "@clerk/ui/themes";
 
-const inter = Inter({subsets:['latin'],variable:'--font-sans'});
+const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -22,11 +24,38 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html
-      lang="en"
-      className={cn("h-full", "antialiased", geistSans.variable, geistMono.variable, "font-sans", inter.variable)}
+    <ClerkProvider
+      appearance={{
+        theme: dark,
+        variables: {
+          colorBackground: "var(--color-bg-base)",
+          colorNeutral: "var(--color-text-primary)",
+          colorPrimary: "var(--color-accent-primary)",
+          colorPrimaryForeground: "var(--color-bg-base)",
+          colorForeground: "var(--color-text-primary)",
+          colorInput: "var(--color-bg-elevated)",
+          colorInputForeground: "var(--color-text-primary)",
+          colorDanger: "var(--color-state-error)",
+          colorSuccess: "var(--color-state-success)",
+          colorWarning: "var(--color-state-warning)",
+          borderRadius: "var(--radius)",
+          fontFamily: "var(--font-geist-sans)",
+        },
+      }}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
-    </html>
+      <html
+        lang="en"
+        className={cn(
+          "h-full",
+          "antialiased",
+          geistSans.variable,
+          geistMono.variable,
+          "font-sans",
+          inter.variable,
+        )}
+      >
+        <body className="min-h-full flex flex-col">{children}</body>
+      </html>
+    </ClerkProvider>
   );
 }
