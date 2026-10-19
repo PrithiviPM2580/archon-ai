@@ -10,16 +10,16 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
-import useProjectDialogs from "@/hooks/use-project-dialogs";
+import type { useProjectActions } from "@/hooks/use-project-actions";
 
-type ProjectDialogProps = ReturnType<typeof useProjectDialogs>;
+type ProjectDialogProps = ReturnType<typeof useProjectActions>;
 
 export default function ProjectDialogs({
   dialogType,
   activeProject,
   name,
-  slug,
-  loading,
+  roomId,
+  isLoading,
   close,
   handleNameChange,
   submit,
@@ -47,11 +47,11 @@ export default function ProjectDialogs({
               onChange={(e) => handleNameChange(e.target.value)}
               autoFocus
             />
-            <p>{slug ? slug : "No slug generated"}</p>
+            <p>{roomId ? roomId : "No room ID generated"}</p>
           </div>
           <DialogFooter showCloseButton>
-            <Button onClick={submit} disabled={!name.trim() || loading}>
-              {loading ? "Creating..." : "Create Project"}
+            <Button onClick={submit} disabled={!name.trim() || isLoading}>
+              {isLoading ? "Creating..." : "Create Project"}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -77,8 +77,8 @@ export default function ProjectDialogs({
           />
 
           <DialogFooter showCloseButton>
-            <Button onClick={submit} disabled={!name.trim() || loading}>
-              {loading ? "Saving…" : "Save"}
+            <Button onClick={submit} disabled={!name.trim() || isLoading}>
+              {isLoading ? "Saving…" : "Save"}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -95,8 +95,8 @@ export default function ProjectDialogs({
           </DialogHeader>
 
           <DialogFooter showCloseButton>
-            <Button variant="destructive" onClick={submit} disabled={loading}>
-              {loading ? "Deleting…" : "Delete Project"}
+            <Button variant="destructive" onClick={submit} disabled={isLoading}>
+              {isLoading ? "Deleting…" : "Delete Project"}
             </Button>
           </DialogFooter>
         </DialogContent>
