@@ -8,9 +8,9 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import type { useProjectActions } from "@/hooks/use-project-actions";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
-import type { useProjectActions } from "@/hooks/use-project-actions";
 
 type ProjectDialogProps = ReturnType<typeof useProjectActions>;
 
@@ -20,6 +20,7 @@ export default function ProjectDialogs({
   name,
   roomId,
   isLoading,
+  error,
   close,
   handleNameChange,
   submit,
@@ -48,6 +49,7 @@ export default function ProjectDialogs({
               autoFocus
             />
             <p>{roomId ? roomId : "No room ID generated"}</p>
+            {error && <p className="text-sm text-destructive">{error}</p>}
           </div>
           <DialogFooter showCloseButton>
             <Button onClick={submit} disabled={!name.trim() || isLoading}>
@@ -75,6 +77,7 @@ export default function ProjectDialogs({
             }}
             autoFocus
           />
+          {error && <p className="text-sm text-destructive">{error}</p>}
 
           <DialogFooter showCloseButton>
             <Button onClick={submit} disabled={!name.trim() || isLoading}>

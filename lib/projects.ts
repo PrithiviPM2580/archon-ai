@@ -3,7 +3,7 @@ import { prisma } from "./prisma";
 export async function getProjectsForUser(userId: string, email: string) {
   const [owned, collaborations] = await Promise.all([
     prisma.project.findMany({
-      where: { id: userId },
+      where: { ownerId: userId },
       orderBy: { createdAt: "desc" },
     }),
     prisma.projectCollaborator.findMany({

@@ -1,7 +1,7 @@
 "use client";
 
+import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
-import { useRouter, usePathname } from "next/navigation";
 
 export interface ProjectRow {
   id: string;
@@ -31,12 +31,14 @@ export function useProjectActions() {
   const [roomId, setRoomId] = useState<string>("");
   const [suffix, setSuffix] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
 
   const openCreate = () => {
     const s = shortSuffix();
     setSuffix(s);
     setName("");
     setRoomId("");
+    setError(null);
     setActiveProject(null);
     setDialogType("create");
   };
@@ -44,12 +46,14 @@ export function useProjectActions() {
   const openRename = (project: ProjectRow) => {
     setName(project.name);
     setRoomId("");
+    setError(null);
     setActiveProject(project);
     setDialogType("rename");
   };
 
   const openDelete = (project: ProjectRow) => {
     setActiveProject(project);
+    setError(null);
     setDialogType("delete");
   };
 
@@ -58,6 +62,7 @@ export function useProjectActions() {
     setActiveProject(null);
     setName("");
     setRoomId("");
+    setError(null);
   };
 
   const handleNameChange = (value: string) => {
@@ -69,6 +74,7 @@ export function useProjectActions() {
   const submit = async () => {
     if (!name.trim() && dialogType !== "delete") return;
     setIsLoading(true);
+    setError(null);
     try {
       if (dialogType === "create") {
         const finalRoomId = roomId || `${toSlug(name.trim())}-${suffix}`;
@@ -77,20 +83,28 @@ export function useProjectActions() {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ name: name.trim(), id: finalRoomId }),
         });
-        if (res.ok) {
-          const { project } = (await res.json()) as { project: { id: string } };
-          router.push(`/editor/${project.id}`);
+        if (!res.ok) {
+          const payload = (await res.json().catch(() => null)) as {
+            message?: string;
+          } | null;
+          throw new Error(payload?.message ?? "Unable to create project");
         }
+        close();
+        router.refresh();
       } else if (dialogType === "rename" && activeProject) {
-        await fetch(`/api/projects/${activeProject.id}`, {
+        const res = await fetch(`/api/projects/${activeProject.id}`, {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ name: name.trim() }),
         });
+        if (!res.ok) throw new Error("Unable to rename project");
         close();
         router.refresh();
       } else if (dialogType === "delete" && activeProject) {
-        await fetch(`/api/projects/${activeProject.id}`, { method: "DELETE" });
+        const res = await fetch(`/api/projects/${activeProject.id}`, {
+          method: "DELETE",
+        });
+        if (!res.ok) throw new Error("Unable to delete project");
         const isActive = pathname === `/editor/${activeProject.id}`;
         close();
         if (isActive) {
@@ -99,6 +113,8 @@ export function useProjectActions() {
           router.refresh();
         }
       }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Something went wrong");
     } finally {
       setIsLoading(false);
     }
@@ -110,6 +126,7 @@ export function useProjectActions() {
     name,
     roomId,
     isLoading,
+    error,
     openCreate,
     openRename,
     openDelete,
